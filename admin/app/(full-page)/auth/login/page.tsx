@@ -11,22 +11,22 @@ import { classNames } from 'primereact/utils';
 import { useAuth } from '~/layout/hooks/auth';
 import { Toast } from 'primereact/toast';
 const LoginPage = () => {
-    const [email, setEmail] = useState<string>('')
-    const [password, setPassword] = useState<string>('')
-    const [shouldRemember, setShouldRemember] = useState<boolean>(false)
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [shouldRemember, setShouldRemember] = useState<boolean>(false);
     const { layoutConfig } = useContext(LayoutContext);
-    const router = useRouter()
-    const [errors, setErrors] = useState<any>([])
+    const router = useRouter();
+    const [errors, setErrors] = useState<any>([]);
     const [status, setStatus] = useState<string | null>(null);
     const toast = useRef(null);
 
     const { login, submitted } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: '/',
-    })
+        redirectIfAuthenticated: '/'
+    });
 
     const submitForm = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        event.preventDefault()
+        event.preventDefault();
 
         login({
             email,
@@ -35,8 +35,8 @@ const LoginPage = () => {
             setErrors,
             setStatus,
             toast
-        })
-    }
+        });
+    };
 
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
 
@@ -59,9 +59,9 @@ const LoginPage = () => {
                                 <div className="text-900 text-3xl font-medium mb-3">¡Bienvenido!</div>
                                 <span className="text-600 font-medium">Inicia sesión para continuar</span>
                             </div>
-                            <form onSubmit={ submitForm }>
+                            <form onSubmit={submitForm}>
                                 <div>
-                                    <div className='mb-5'>
+                                    <div className="mb-5">
                                         <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                             Correo
                                         </label>
@@ -72,19 +72,28 @@ const LoginPage = () => {
                                             </small>
                                         </div>
                                     </div>
-                                    
-                                    <div className='mb-5'>
-                                        <label  htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
+
+                                    <div className="mb-5">
+                                        <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
                                             Contraseña
                                         </label>
-                                        <Password aria-describedby="password-help" required inputId="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" toggleMask className="w-full" inputClassName="w-full p-3 md:w-30rem"></Password>
+                                        <Password
+                                            aria-describedby="password-help"
+                                            required
+                                            inputId="password1"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Contraseña"
+                                            toggleMask
+                                            className="w-full"
+                                            inputClassName="w-full p-3 md:w-30rem"
+                                        ></Password>
                                         <div>
                                             <small id="password-help" className="p-error">
                                                 {errors.password}
                                             </small>
                                         </div>
                                     </div>
-                                    
 
                                     <div className="flex align-items-center justify-content-between mb-5 gap-5">
                                         <div className="flex align-items-center">
@@ -95,8 +104,8 @@ const LoginPage = () => {
                                             ¿Has olvidado tu contraseña?
                                         </a>
                                     </div>
-                                    <Button type='submit' label="Iniciar sesión" icon="pi pi-check" loading={ submitted } className="w-full p-3 text-xl"/>
-                                </div>  
+                                    <Button type="submit" label="Iniciar sesión" icon="pi pi-check" loading={submitted} className="w-full p-3 text-xl" />
+                                </div>
                             </form>
                         </div>
                     </div>

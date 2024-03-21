@@ -12,7 +12,7 @@ import { Demo } from '~/types/types';
 import { useFetchUsers } from '~/layout/hooks/users';
 import { useFetchRoles } from '~/layout/hooks/roles';
 import User from '~/demo/components/modals/users/User';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 import { getDefaultImage } from '~/helpers/helpers';
 
 const Users = () => {
@@ -20,11 +20,11 @@ const Users = () => {
         id: '',
         name: '',
         state: true,
-        email:'',
+        email: '',
         password: '',
         password_confirmation: '',
         email_verified: false,
-        role: {id: '', name:''},
+        role: { id: '', name: '' }
     };
 
     const [submitted, setSubmitted] = useState<boolean>(false);
@@ -41,9 +41,9 @@ const Users = () => {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    const {users, loading, meta } = useFetchUsers(currentPage, itemsPerPage, globalFilter, submitted);
+    const { users, loading, meta } = useFetchUsers(currentPage, itemsPerPage, globalFilter, submitted);
 
-    const {roles, loadingRoles, metaRoles } = useFetchRoles(currentPage, itemsPerPage, globalFilter, submittedRole);
+    const { roles, loadingRoles, metaRoles } = useFetchRoles(currentPage, itemsPerPage, globalFilter, submittedRole);
 
     const openNew = () => {
         setUser(emptyUser);
@@ -59,7 +59,7 @@ const Users = () => {
 
     const UpdateUser = (user: Demo.User) => {
         setUser({ ...user });
-    }
+    };
 
     const hideDialog = () => {
         setUserDialog(false);
@@ -81,18 +81,19 @@ const Users = () => {
 
     const deleteUser = () => {
         setSubmitted(true);
-        axios.delete(`/admin/users/${user.id}` )
-        .then( response => {
-          setTimeout(() => {
-            setSubmitted(false);
-            hideDeleteUserDialog();
-          }, 500)
-        }).catch(e => {
-            console.warn(e);
-            setSubmitted(false);
-        });
+        axios
+            .delete(`/admin/users/${user.id}`)
+            .then((response) => {
+                setTimeout(() => {
+                    setSubmitted(false);
+                    hideDeleteUserDialog();
+                }, 500);
+            })
+            .catch((e) => {
+                console.warn(e);
+                setSubmitted(false);
+            });
     };
-
 
     const exportCSV = () => {
         dt.current?.exportCSV();
@@ -148,7 +149,7 @@ const Users = () => {
         return (
             <>
                 <span className="p-column-title">Nombre</span>
-                <span style={{textTransform: 'capitalize'}}>{rowData.name}</span>
+                <span style={{ textTransform: 'capitalize' }}>{rowData.name}</span>
             </>
         );
     };
@@ -166,13 +167,7 @@ const Users = () => {
         return (
             <>
                 <span className="p-column-title">Estado</span>
-                {
-                    rowData.state ?
-                        <span className="customer-badge status-qualified">{ 'Activo'}</span>
-                    :
-                        <span className="customer-badge status-negotiation">{ 'Inactivo'}</span>
-                }
-                
+                {rowData.state ? <span className="customer-badge status-qualified">{'Activo'}</span> : <span className="customer-badge status-negotiation">{'Inactivo'}</span>}
             </>
         );
     };
@@ -181,15 +176,14 @@ const Users = () => {
         return (
             <>
                 <span className="p-column-title">rol</span>
-                <span style={{textTransform: 'capitalize'}}> {rowData.role.name ? rowData.role.name : 'N/A'}</span>
-                
+                <span style={{ textTransform: 'capitalize' }}> {rowData.role.name ? rowData.role.name : 'N/A'}</span>
             </>
         );
     };
 
     const actionBodyTemplate = (rowData: Demo.User) => {
         return (
-            <div className='flex justify-content-center align-items-center'>
+            <div className="flex justify-content-center align-items-center">
                 <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editUser(rowData)} />
                 <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteUser(rowData)} />
             </div>
@@ -212,11 +206,10 @@ const Users = () => {
         </div>
     );
 
-   
     const deleteUserDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteUserDialog} />
-            <Button loading={ submitted } label="Si" icon="pi pi-check" text onClick={deleteUser} />
+            <Button loading={submitted} label="Si" icon="pi pi-check" text onClick={deleteUser} />
         </>
     );
     const deleteUsersDialogFooter = (
@@ -232,59 +225,57 @@ const Users = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                    {
-                        !loading ?
-                            <>
-                                <DataTable
-                                    ref={dt}
-                                    value={users}
-                                    selection={selectedUsers}
-                                    onSelectionChange={(e) => setSelectedUsers(e.value as any)}
-                                    dataKey="id"
-                                    paginator
-                                    rows={10}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                    className="datatable-responsive"
-                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                                    //globalFilter={globalFilter}
-                                    emptyMessage="No se encontraron usuarios"
-                                    header={header}
-                                    responsiveLayout="scroll"
-                                >
-                                    <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                                    <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    {/* <Column header="Imagen" body={imageBodyTemplate}></Column> */}
-                                    <Column field="email" header="E-mail" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    <Column field="status" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '6rem' }}></Column>
-                                    <Column field="rol" header="Rol"  body={RoleBodyTemplate}></Column>
-                                    <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                                </DataTable>
+                    {!loading ? (
+                        <>
+                            <DataTable
+                                ref={dt}
+                                value={users}
+                                selection={selectedUsers}
+                                onSelectionChange={(e) => setSelectedUsers(e.value as any)}
+                                dataKey="id"
+                                paginator
+                                rows={10}
+                                rowsPerPageOptions={[5, 10, 25]}
+                                className="datatable-responsive"
+                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                                //globalFilter={globalFilter}
+                                emptyMessage="No se encontraron usuarios"
+                                header={header}
+                                responsiveLayout="scroll"
+                            >
+                                <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
+                                <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                {/* <Column header="Imagen" body={imageBodyTemplate}></Column> */}
+                                <Column field="email" header="E-mail" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                <Column field="status" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '6rem' }}></Column>
+                                <Column field="rol" header="Rol" body={RoleBodyTemplate}></Column>
+                                <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                            </DataTable>
 
-                                <User submitted={ submitted } setSubmitted={setSubmitted} roles = {roles} setUserDialog = { setUserDialog } isEdit = {isEdit} hideDialog = { hideDialog } user = { user } userDialog = { UserDialog } updateUser = { UpdateUser }/>
+                            <User submitted={submitted} setSubmitted={setSubmitted} roles={roles} setUserDialog={setUserDialog} isEdit={isEdit} hideDialog={hideDialog} user={user} userDialog={UserDialog} updateUser={UpdateUser} />
 
-                                <Dialog visible={deleteUserDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUserDialogFooter} onHide={hideDeleteUserDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {user && (
-                                            <span>
-                                                ¿Está seguro de que quieres eliminar a? <b>{user.name}</b>?
-                                            </span>
-                                        )}
-                                    </div>
-                                </Dialog>
+                            <Dialog visible={deleteUserDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUserDialogFooter} onHide={hideDeleteUserDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {user && (
+                                        <span>
+                                            ¿Está seguro de que quieres eliminar a? <b>{user.name}</b>?
+                                        </span>
+                                    )}
+                                </div>
+                            </Dialog>
 
-                                <Dialog visible={deleteUsersDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUsersDialogFooter} onHide={hideDeleteUsersDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {user && <span>¿Estás seguro de que deseas eliminar los usuarios seleccionados?</span>}
-                                    </div>
-                                </Dialog>
-                            </>
-                        : 
+                            <Dialog visible={deleteUsersDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUsersDialogFooter} onHide={hideDeleteUsersDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {user && <span>¿Estás seguro de que deseas eliminar los usuarios seleccionados?</span>}
+                                </div>
+                            </Dialog>
+                        </>
+                    ) : (
                         isLoading
-                    }
-                    
+                    )}
                 </div>
             </div>
         </div>

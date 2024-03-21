@@ -1,5 +1,5 @@
 import { Demo } from '~/types/types';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 
 export const getUsersService = (page: number, limit: number, search: string) => {
     const query = {

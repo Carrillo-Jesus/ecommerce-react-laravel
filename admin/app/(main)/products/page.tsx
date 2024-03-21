@@ -14,12 +14,12 @@ import { Demo } from '../../../types/types';
 import { useFetchProducts } from '../../../layout/hooks/products';
 import Product from '../../../demo/components/modals/products/Product';
 import { getDefaultImage } from '~/helpers/helpers';
-import Link from 'next/link'
+import Link from 'next/link';
 const Products = () => {
     let emptyProduct: Demo.Product = {
         id: '',
         name: '',
-        handle:'',
+        handle: '',
         description: '',
         price: 0,
         rating: 0,
@@ -34,8 +34,8 @@ const Products = () => {
             id: '',
             short_name: '',
             description: '',
-            image: '',            
-            handle: '',
+            image: '',
+            handle: ''
         },
         featured: false,
         tax_rate: 0,
@@ -43,8 +43,8 @@ const Products = () => {
         free_shipping: false,
         thumbnail: null,
         collection_id: '',
-        is_active:  true,
-        is_giftcard:  false,
+        is_active: true,
+        is_giftcard: false,
         categories: []
     };
 
@@ -61,8 +61,7 @@ const Products = () => {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    const {products, loading, meta } = useFetchProducts(currentPage, itemsPerPage, globalFilter);
-
+    const { products, loading, meta } = useFetchProducts(currentPage, itemsPerPage, globalFilter);
 
     const formatCurrency = (value: number) => {
         return value.toLocaleString('en-US', {
@@ -86,7 +85,7 @@ const Products = () => {
 
     const UpdateProduct = (product: Demo.Product) => {
         setProduct({ ...product });
-    }
+    };
 
     const hideDialog = () => {
         setSubmitted(false);
@@ -166,8 +165,10 @@ const Products = () => {
         return (
             <React.Fragment>
                 <div className="my-2">
-                    <Link href="/products/store"><Button label="New" icon="pi pi-plus" severity="success" className=" mr-2"/></Link> 
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={ confirmDeleteSelected } disabled={!selectedProducts || !(selectedProducts as any).length} />
+                    <Link href="/products/store">
+                        <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" />
+                    </Link>
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !(selectedProducts as any).length} />
                 </div>
             </React.Fragment>
         );
@@ -204,7 +205,7 @@ const Products = () => {
         return (
             <>
                 <span className="p-column-title">Imagen</span>
-                <img onError={ (e) => getDefaultImage(e, rowData.name) } src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/products/thumbnails/${rowData.thumbnail}`} alt={rowData.name} className="shadow-2" width="100" />
+                <img onError={(e) => getDefaultImage(e, rowData.name)} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/products/thumbnails/${rowData.thumbnail}`} alt={rowData.name} className="shadow-2" width="100" />
             </>
         );
     };
@@ -279,7 +280,6 @@ const Products = () => {
         </div>
     );
 
-   
     const deleteProductDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteProductDialog} />
@@ -299,61 +299,59 @@ const Products = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                    {
-                        !loading ?
-                            <>
-                                <DataTable
-                                    ref={dt}
-                                    value={products}
-                                    selection={selectedProducts}
-                                    onSelectionChange={(e) => setSelectedProducts(e.value as any)}
-                                    dataKey="id"
-                                    paginator
-                                    rows={10}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                    className="datatable-responsive"
-                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                                    //globalFilter={globalFilter}
-                                    emptyMessage="No se encontraron prodcutos"
-                                    header={header}
-                                    responsiveLayout="scroll"
-                                >
-                                    <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                                    <Column field="sku" header="Sku" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    <Column header="Imagen" body={imageBodyTemplate}></Column>
-                                    <Column field="cost" header="Costo" body={costBodyTemplate} sortable></Column>
-                                    <Column field="price" header="Precio" body={priceBodyTemplate} sortable></Column>
-                                    <Column field="brand" header="Marca" sortable body={brandBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                                    <Column field="inventoryStatus" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
-                                    <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                                </DataTable>
+                    {!loading ? (
+                        <>
+                            <DataTable
+                                ref={dt}
+                                value={products}
+                                selection={selectedProducts}
+                                onSelectionChange={(e) => setSelectedProducts(e.value as any)}
+                                dataKey="id"
+                                paginator
+                                rows={10}
+                                rowsPerPageOptions={[5, 10, 25]}
+                                className="datatable-responsive"
+                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                                //globalFilter={globalFilter}
+                                emptyMessage="No se encontraron prodcutos"
+                                header={header}
+                                responsiveLayout="scroll"
+                            >
+                                <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
+                                <Column field="sku" header="Sku" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                <Column header="Imagen" body={imageBodyTemplate}></Column>
+                                <Column field="cost" header="Costo" body={costBodyTemplate} sortable></Column>
+                                <Column field="price" header="Precio" body={priceBodyTemplate} sortable></Column>
+                                <Column field="brand" header="Marca" sortable body={brandBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                                <Column field="inventoryStatus" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
+                                <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                            </DataTable>
 
-                                {/* <Product isEdit = {isEdit} saveProduct={ saveProduct } hideDialog = { hideDialog } submitted = { submitted } product = { product } productDialog = { productDialog } UpdateProduct = { UpdateProduct }/> */}
+                            {/* <Product isEdit = {isEdit} saveProduct={ saveProduct } hideDialog = { hideDialog } submitted = { submitted } product = { product } productDialog = { productDialog } UpdateProduct = { UpdateProduct }/> */}
 
-                                <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {product && (
-                                            <span>
-                                                Are you sure you want to delete <b>{product.name}</b>?
-                                            </span>
-                                        )}
-                                    </div>
-                                </Dialog>
+                            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {product && (
+                                        <span>
+                                            Are you sure you want to delete <b>{product.name}</b>?
+                                        </span>
+                                    )}
+                                </div>
+                            </Dialog>
 
-                                <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {product && <span>Are you sure you want to delete the selected products?</span>}
-                                    </div>
-                                </Dialog>
-                            </>
-                        : 
+                            <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                                </div>
+                            </Dialog>
+                        </>
+                    ) : (
                         isLoading
-                    }
-                    
+                    )}
                 </div>
             </div>
         </div>

@@ -11,17 +11,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Demo } from '~/types/types';
 import { useFetchCategories } from '~/layout/hooks/categories';
 import Category from '~/demo/components/modals/categories/Category';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 import { getDefaultImage } from '~/helpers/helpers';
 
 const Categories = () => {
-    let emptyCategory: Demo.Category= {
+    let emptyCategory: Demo.Category = {
         id: '',
         name: '',
-        handle:'',
+        handle: '',
         description: '',
         image: null,
-        short_name: '',
+        short_name: ''
     };
 
     const [submitted, setSubmitted] = useState<boolean>(false);
@@ -37,8 +37,7 @@ const Categories = () => {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    const {categories, loading, meta } = useFetchCategories(currentPage, itemsPerPage, globalFilter, submitted);
-
+    const { categories, loading, meta } = useFetchCategories(currentPage, itemsPerPage, globalFilter, submitted);
 
     const openNew = () => {
         setCategory(emptyCategory);
@@ -54,7 +53,7 @@ const Categories = () => {
 
     const UpdateCategory = (category: Demo.Category) => {
         setCategory({ ...category });
-    }
+    };
 
     const hideDialog = () => {
         setCategoryDialog(false);
@@ -76,16 +75,18 @@ const Categories = () => {
 
     const deleteCategory = () => {
         setSubmitted(true);
-        axios.delete(`/api/categories/${category.id}` )
-        .then( response => {
-          setTimeout(() => {
-            setSubmitted(false);
-            hideDeleteCategoryDialog();
-          }, 500)
-        }).catch(e => {
-            console.warn(e);
-            setSubmitted(false);
-        });
+        axios
+            .delete(`/api/categories/${category.id}`)
+            .then((response) => {
+                setTimeout(() => {
+                    setSubmitted(false);
+                    hideDeleteCategoryDialog();
+                }, 500);
+            })
+            .catch((e) => {
+                console.warn(e);
+                setSubmitted(false);
+            });
     };
 
     const findIndexById = (id: string) => {
@@ -172,7 +173,7 @@ const Categories = () => {
         return (
             <>
                 <span className="p-column-title">Imagen</span>
-                <img onError={ (e) => getDefaultImage(e, rowData.name) } src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/categories/${rowData.image}`} alt={rowData.name} className="shadow-2" width="100" />
+                <img onError={(e) => getDefaultImage(e, rowData.name)} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/categories/${rowData.image}`} alt={rowData.name} className="shadow-2" width="100" />
             </>
         );
     };
@@ -211,11 +212,10 @@ const Categories = () => {
         </div>
     );
 
-   
     const deleteCategoryDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteCategoryDialog} />
-            <Button loading={ submitted } label="Si" icon="pi pi-check" text onClick={deleteCategory} />
+            <Button loading={submitted} label="Si" icon="pi pi-check" text onClick={deleteCategory} />
         </>
     );
     const deleteCategoriesDialogFooter = (
@@ -231,59 +231,57 @@ const Categories = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                    {
-                        !loading ?
-                            <>
-                                <DataTable
-                                    ref={dt}
-                                    value={categories}
-                                    selection={selectedCategories}
-                                    onSelectionChange={(e) => setSelectedCategories(e.value as any)}
-                                    dataKey="id"
-                                    paginator
-                                    rows={10}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                    className="datatable-responsive"
-                                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                                    //globalFilter={globalFilter}
-                                    emptyMessage="No se encontraron prodcutos"
-                                    header={header}
-                                    responsiveLayout="scroll"
-                                >
-                                    <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                                    <Column header="Imagen" body={imageBodyTemplate}></Column>
-                                    {/* <Column field="id" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
-                                    <Column field="short_name" header="Nombre corto" sortable body={shortNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                                    <Column field="inventoryStatus" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
-                                    <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                                </DataTable>
+                    {!loading ? (
+                        <>
+                            <DataTable
+                                ref={dt}
+                                value={categories}
+                                selection={selectedCategories}
+                                onSelectionChange={(e) => setSelectedCategories(e.value as any)}
+                                dataKey="id"
+                                paginator
+                                rows={10}
+                                rowsPerPageOptions={[5, 10, 25]}
+                                className="datatable-responsive"
+                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                                //globalFilter={globalFilter}
+                                emptyMessage="No se encontraron prodcutos"
+                                header={header}
+                                responsiveLayout="scroll"
+                            >
+                                <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
+                                <Column header="Imagen" body={imageBodyTemplate}></Column>
+                                {/* <Column field="id" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                                <Column field="short_name" header="Nombre corto" sortable body={shortNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                <Column field="name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                                <Column field="inventoryStatus" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
+                                <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                            </DataTable>
 
-                                <Category setCategoryDialog = { setCategoryDialog } isEdit = {isEdit} hideDialog = { hideDialog } category = { category } categoryDialog = { CategoryDialog } UpdateCategory = { UpdateCategory }/>
+                            <Category setCategoryDialog={setCategoryDialog} isEdit={isEdit} hideDialog={hideDialog} category={category} categoryDialog={CategoryDialog} UpdateCategory={UpdateCategory} />
 
-                                <Dialog visible={deleteCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCategoryDialogFooter} onHide={hideDeleteCategoryDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {category && (
-                                            <span>
-                                                ¿Está seguro de que quieres eliminar? <b>{category.name}</b>?
-                                            </span>
-                                        )}
-                                    </div>
-                                </Dialog>
+                            <Dialog visible={deleteCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCategoryDialogFooter} onHide={hideDeleteCategoryDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {category && (
+                                        <span>
+                                            ¿Está seguro de que quieres eliminar? <b>{category.name}</b>?
+                                        </span>
+                                    )}
+                                </div>
+                            </Dialog>
 
-                                <Dialog visible={deleteCategoriesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCategoriesDialogFooter} onHide={hideDeleteCategoriesDialog}>
-                                    <div className="flex align-items-center justify-content-center">
-                                        <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                        {category && <span>¿Estás seguro de que deseas eliminar los productos seleccionados?</span>}
-                                    </div>
-                                </Dialog>
-                            </>
-                        : 
+                            <Dialog visible={deleteCategoriesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCategoriesDialogFooter} onHide={hideDeleteCategoriesDialog}>
+                                <div className="flex align-items-center justify-content-center">
+                                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                                    {category && <span>¿Estás seguro de que deseas eliminar los productos seleccionados?</span>}
+                                </div>
+                            </Dialog>
+                        </>
+                    ) : (
                         isLoading
-                    }
-                    
+                    )}
                 </div>
             </div>
         </div>

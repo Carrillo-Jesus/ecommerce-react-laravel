@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 import { Demo } from '../../types/types';
 interface State {
   products: Demo.Product[];

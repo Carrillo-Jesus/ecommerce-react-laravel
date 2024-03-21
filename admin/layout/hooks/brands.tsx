@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 interface InputValue {
   name: string;
   id: string;

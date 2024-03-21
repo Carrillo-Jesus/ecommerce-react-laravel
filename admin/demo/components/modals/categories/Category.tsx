@@ -8,7 +8,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState,  RefObject} from 'react';
 import { Demo } from '../../../../types/types';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 const Category = ({ category, setCategoryDialog, categoryDialog, hideDialog, UpdateCategory, isEdit, }: {
     category: Demo.Category;
     setCategoryDialog: (show: boolean) => void;

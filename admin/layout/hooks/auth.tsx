@@ -1,5 +1,5 @@
 import useSWR, { SWRResponse } from 'swr';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Demo } from '~/types/demo';

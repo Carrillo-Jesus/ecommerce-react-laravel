@@ -1,4 +1,4 @@
-import axios from '~/config';
+import axios from '~/demo/service/config';
 
 export const getRolsService = (page: number, limit: number, search: string) => {
     const query = {

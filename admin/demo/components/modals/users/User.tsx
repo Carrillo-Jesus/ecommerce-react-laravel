@@ -7,7 +7,7 @@ import { classNames } from 'primereact/utils';
 import { Dropdown } from 'primereact/dropdown';
 import React, { useEffect, useRef, useState,  RefObject} from 'react';
 import { Demo } from '../../../../types/types';
-import axios from '~/config';
+import axios from '~/demo/service/config';
 import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
 const User = ({ user, setUserDialog, userDialog, hideDialog, updateUser, isEdit, roles, submitted, setSubmitted}: {
     user: Demo.User;
