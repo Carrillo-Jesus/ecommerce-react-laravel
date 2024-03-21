@@ -24,25 +24,28 @@ class ProductsController extends Controller
         $pageSize = $request->limit ?? 15;
         $page = $request->page ?? 1;
         $orderBy = $request->order_by ?? 'id';
-        $sort = $request->sort ?? 'desc';
+        $sort = $request->sort ?? 'asc';
 
-        $products = Product::where('is_active', 1)
-                            ->where(function($query) use ($request) {
-                                if($request->has('search')){
-                                    $query->where('name', 'LIKE', "%{$request->search}%")
-                                    ->orWhere('sku', 'LIKE', "%{$request->search}%");
-                                }
+        $products = Product::where('deleted_at', null);
 
-                                if($request->has('brand_id')){
-                                    $query->where('brand_id', $request->brand_id);
-                                }
+        if($request->has('search') && !empty($request->search)){
+            $products->where(function($query) use ($request) {
+                $query->where('name', 'LIKE', "%{$request->search}%")
+                    ->orWhere('sku', 'LIKE', "%{$request->search}%");
+            });
+        }
 
-                                if($request->has('collection_id')){
-                                    $query->where('collection_id', $request->collection_id);
-                                }
-                            })
-                            ->orderBy($orderBy, $sort)
+        if($request->has('brand_id') && !empty($request->brand_id)){
+            $products->where('brand_id', $request->brand_id);
+        }
+
+        if($request->has('collection_id') && !empty($request->collection_id)){
+            $products->where('collection_id', $request->collection_id);
+        }
+
+        $products = $products->orderBy($orderBy, $sort)
                             ->paginate($pageSize, page: $page);
+
         $items = [];
 
         foreach( $products->items() as $product ) {
@@ -172,6 +175,17 @@ class ProductsController extends Controller
         $product->delete();
 
         return response()->json(['status' => 1, 'message' => 'Producto eliminado correctamente']);
+    }
+
+    public  function multipleDestroy(Request $request)
+    {
+        $ids = $request->ids;
+
+        if( !is_array($ids) || count($ids) == 0 ) return response()->json(['status' => 0, 'message' => 'Debe seleccionar al menos un producto'], Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        Product::whereIn('id', $ids)->delete();
+
+        return response()->json(['status' => 1, 'message' => 'Productos eliminados correctamente']);
     }
 }
 

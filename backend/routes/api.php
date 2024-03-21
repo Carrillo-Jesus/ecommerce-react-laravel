@@ -26,3 +26,4 @@ Route::resource('categories', CategoriesController::class)->only(['index', 'show
 Route::resource('brands', BrandsController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 Route::resource('collections', CollectionsController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 Route::resource('products', ProductsController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::post('/products/multipleElimination', [ProductsController::class, 'multipleDestroy']);

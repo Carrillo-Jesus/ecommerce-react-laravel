@@ -9,7 +9,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { Demo } from '~/types/types';
-import { useFetchCategories } from '~/layout/hooks/categories';
+import { useFetchCategories } from '~/demo/service/hooks/categories';
 import Category from '~/demo/components/modals/categories/Category';
 import axios from '~/demo/service/config';
 import { getDefaultImage } from '~/helpers/helpers';

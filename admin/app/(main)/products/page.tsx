@@ -1,20 +1,22 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
+import { DataTable} from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
 import { Rating } from 'primereact/rating';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import React, { useEffect, useRef, useState } from 'react';
 import { Demo } from '../../../types/types';
-import { useFetchProducts } from '../../../layout/hooks/products';
-import Product from '../../../demo/components/modals/products/Product';
+import { useFetchProducts } from '../../../demo/service/hooks/products';
 import { getDefaultImage } from '~/helpers/helpers';
 import Link from 'next/link';
+import axios from '~/demo/service/config';
+import { useRouter } from 'next/navigation';
+import emitter from '~/helpers/events';
 const Products = () => {
     let emptyProduct: Demo.Product = {
         id: '',
@@ -47,21 +49,20 @@ const Products = () => {
         is_giftcard: false,
         categories: []
     };
-
+    const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [first, setFirst] = useState(0);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
     const [product, setProduct] = useState<Demo.Product>(emptyProduct);
-    const [isEdit, setIsEdit] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    const { products, loading, meta } = useFetchProducts(currentPage, itemsPerPage, globalFilter);
+    let { products, loading, meta } = useFetchProducts(currentPage, itemsPerPage, globalFilter);
 
     const formatCurrency = (value: number) => {
         return value.toLocaleString('en-US', {
@@ -70,28 +71,12 @@ const Products = () => {
         });
     };
 
-    // const openNew = () => {
-    //     setProduct(emptyProduct);
-    //     setIsEdit(false);
-    //     setSubmitted(false);
-    //     setProductDialog(true);
-    // };
-
-    const editProduct = (product: Demo.Product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
-        setIsEdit(true);
+    const onPageChange = (event: PaginatorPageChangeEvent) => {
+        setCurrentPage(event.page + 1);
+        setItemsPerPage(event.rows);
+        setFirst(event.first);
     };
 
-    const UpdateProduct = (product: Demo.Product) => {
-        setProduct({ ...product });
-    };
-
-    const hideDialog = () => {
-        setSubmitted(false);
-        setProductDialog(false);
-        setIsEdit(false);
-    };
 
     const hideDeleteProductDialog = () => {
         setDeleteProductDialog(false);
@@ -107,38 +92,30 @@ const Products = () => {
     };
 
     const deleteProduct = () => {
-        let _products = (products as any)?.filter((val: any) => val.id !== product.id);
-        //setProducts(_products);
-        setDeleteProductDialog(false);
-        setProduct(emptyProduct);
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Product Deleted',
-            life: 3000
+        axios.delete(`api/products/${product.id}`)
+        .then(response => {
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful',
+                detail: response.data.message,
+                life: 3000
+            });
+            setProduct(emptyProduct);
+            setDeleteProductDialog(false);
+            emitter.emit('updateProducts');
+        })
+        .catch(error => {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error.response.data.message,
+                life: 3000
+            });
+        
         });
-    };
 
-    const findIndexById = (id: string) => {
-        let index = -1;
-        for (let i = 0; i < (products as any)?.length; i++) {
-            if ((products as any)[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
     };
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    };
+   
 
     const exportCSV = () => {
         dt.current?.exportCSV();
@@ -149,16 +126,30 @@ const Products = () => {
     };
 
     const deleteSelectedProducts = () => {
-        let _products = (products as any)?.filter((val: any) => !(selectedProducts as any)?.includes(val));
-        //setProducts(_products);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Products Deleted',
-            life: 3000
+
+        const ids = (selectedProducts as any)?.map((product: Demo.Product) => product.id);
+       
+        axios.post(`api/products/multipleElimination`, { ids: ids })
+        .then(response => {
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful',
+                detail: response.data.message,
+                life: 3000
+            });
+            emitter.emit('updateProducts');
+            setDeleteProductsDialog(false);
+            setSelectedProducts(null);
+        })
+        .catch(error => {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: error.response.data.message,
+                life: 3000
+            });
         });
+       
     };
 
     const leftToolbarTemplate = () => {
@@ -237,15 +228,6 @@ const Products = () => {
         );
     };
 
-    const ratingBodyTemplate = (rowData: Demo.Product) => {
-        return (
-            <>
-                <span className="p-column-title">Reviews</span>
-                <Rating value={rowData.rating} readOnly cancel={false} />
-            </>
-        );
-    };
-
     const statusBodyTemplate = (rowData: Demo.Product) => {
         return (
             <>
@@ -258,7 +240,7 @@ const Products = () => {
     const actionBodyTemplate = (rowData: Demo.Product) => {
         return (
             <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editProduct(rowData)} />
+                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => router.push('/products/edit/'+rowData.id)} />
                 <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteProduct(rowData)} />
             </>
         );
@@ -286,6 +268,7 @@ const Products = () => {
             <Button label="Yes" icon="pi pi-check" text onClick={deleteProduct} />
         </>
     );
+
     const deleteProductsDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteProductsDialog} />
@@ -307,13 +290,7 @@ const Products = () => {
                                 selection={selectedProducts}
                                 onSelectionChange={(e) => setSelectedProducts(e.value as any)}
                                 dataKey="id"
-                                paginator
-                                rows={10}
-                                rowsPerPageOptions={[5, 10, 25]}
                                 className="datatable-responsive"
-                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                                //globalFilter={globalFilter}
                                 emptyMessage="No se encontraron prodcutos"
                                 header={header}
                                 responsiveLayout="scroll"
@@ -328,15 +305,14 @@ const Products = () => {
                                 <Column field="inventoryStatus" header="Estado" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
                                 <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                             </DataTable>
-
-                            {/* <Product isEdit = {isEdit} saveProduct={ saveProduct } hideDialog = { hideDialog } submitted = { submitted } product = { product } productDialog = { productDialog } UpdateProduct = { UpdateProduct }/> */}
+                            <Paginator   template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" first={first} rows={itemsPerPage} totalRecords={meta.total} rowsPerPageOptions={[5, 10, 25, 50]} onPageChange={onPageChange}></Paginator>
 
                             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                                 <div className="flex align-items-center justify-content-center">
                                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                                     {product && (
                                         <span>
-                                            Are you sure you want to delete <b>{product.name}</b>?
+                                           ¿Estás seguro de que quieres eliminar <b>{product.name}</b>?
                                         </span>
                                     )}
                                 </div>
@@ -345,7 +321,7 @@ const Products = () => {
                             <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                                 <div className="flex align-items-center justify-content-center">
                                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                                    {product && <span>¿Estás seguro de que deseas eliminar los productos seleccionados?</span>}
                                 </div>
                             </Dialog>
                         </>

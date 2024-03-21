@@ -1,6 +1,6 @@
 import { MultiSelect,  MultiSelectFilterEvent  } from 'primereact/multiselect';
 import { useEffect, useState } from 'react';
-import { useFetchCategories } from '~/layout/hooks/categories';
+import { useFetchCategories } from '~/demo/service/hooks/categories';
 import { Demo } from '../../../../types/types';
 
 function MultiSelectCategories ({ onValueReceivedCategories }: {onValueReceivedCategories: (value: Demo.Category[]) => void}) {

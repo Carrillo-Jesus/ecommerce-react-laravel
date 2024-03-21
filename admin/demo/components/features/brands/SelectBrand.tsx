@@ -1,6 +1,6 @@
 import { Dropdown, DropdownFilterEvent } from 'primereact/dropdown';
 import { useState, useEffect } from 'react';
-import { useFetchBrands } from '../../../../layout/hooks/brands';
+import { useFetchBrands } from '../../../service/hooks/brands';
 import { Demo } from '../../../../types/types';
 function SelectBrand({ onValueReceivedBrand }: {onValueReceivedBrand: (value: Demo.Brand) => void}) {
     const [page, setPage] = useState(1);

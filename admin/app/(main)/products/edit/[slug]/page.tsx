@@ -13,7 +13,8 @@ import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
 import axios from '~/demo/service/config';
 import { useRouter } from 'next/navigation';
 
-const Product = () => {
+const Page = ({ params }: { params: { slug: string } }) => {
+
     let emptyProduct: Demo.Product = {
         name: '',
         handle: '',
@@ -42,7 +43,6 @@ const Product = () => {
         is_giftcard: false,
         categories: []
     };
-
     const router = useRouter();
     const [product, setProduct] = useState<Demo.Product>(emptyProduct);
     const [thumbnail, setThumbnail] = useState<File | null | string>(null);
@@ -241,4 +241,4 @@ const Product = () => {
     );
 };
 
-export default Product;
+export default Page;
